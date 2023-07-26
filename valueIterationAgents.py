@@ -49,14 +49,15 @@ class ValueIterationAgent(ValueEstimationAgent):
             self.values[state] = 0
             stateActions[state] = self.mdp.getPossibleActions(state)
         
+        iterationValues = self.values.copy()
         for iteration in range(iterations):          
             for state in self.mdp.getStates():
                 if (not self.mdp.isTerminal(state)):
                     values = []
                     for action in stateActions[state]:
                         values.append(self.computeQValueFromValues(state, action))
-                    max_value = max(values)
-                    self.values[state] = max_value
+                    iterationValues[state] = max(values) 
+            self.values = iterationValues.copy()        
 
     def getValue(self, state):
         """
