@@ -44,47 +44,24 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
-        self.learningRate = 0.5
-        actions = dict()
+        print('tua mae aquela enorme')
+
+        stateActions = dict()
         for state in mdp.getStates():
             self.values[state] = 0
-            actions[state] = self.mdp.getPossibleActions(state)
+            stateActions[state] = self.mdp.getPossibleActions(state)
         
         counter = 0
-        while counter < iterations:            
+        while counter < iterations:   
+            print(counter)         
             for state in self.mdp.getStates():
                 if (not self.mdp.isTerminal):
-                    statesAndProbs = []
-                    action1StatesAndProbs = [], action2StatesAndProbs = [], action3StatesAndProbs = [], action4StatesAndProbs = []
-                    # for action in actions[state]:
-                    #     statesAndProbs.append(mdp.getTransitionStatesAndProbs(state, action))          
-                    actionStatesAndProbs = []
-                    for stateAndProb in self.mdp.getTransitionStatesAndProbs(state, actions[0]): 
-                        action1StatesAndProbs.append(stateAndProb) 
-                    
-                    for stateAndProb in self.mdp.getTransitionStatesAndProbs(state, actions[1]): 
-                        action2StatesAndProbs.append(stateAndProb) 
-                    
-                    for stateAndProb in self.mdp.getTransitionStatesAndProbs(state, actions[2]): 
-                        action3StatesAndProbs.append(stateAndProb) 
-                    
-                    for stateAndProb in self.mdp.getTransitionStatesAndProbs(state, actions[3]): 
-                        action4StatesAndProbs.append(stateAndProb) 
-                    
-                    for elem in self.mdp.getTransitionStatesAndProbs(state, actions[1]): statesAndProbs.append(elem) 
-
-                    self.values[state] = -0.9 + self.learningRate*max(
-                        sum(prob*val for prob, val in action1StatesAndProbs),
-                        sum(prob*val for prob, val in action2StatesAndProbs),
-                        sum(prob*val for prob, val in action3StatesAndProbs),
-                        sum(prob*val for prob, val in action4StatesAndProbs)
-                    )
-
-        
-    # def somaacoes(self, mdp, state, listProbs(nextState, prob)):
-    #     for elem in listProbs:
-    #         listProbs[1] * mdp.getReward(state, )
-
+                    action1StatesAndProbs = [], action2StatesAndProbs = [], action3StatesAndProbs = [], action4StatesAndProbs = []      
+                    values = []
+                    for action in stateActions[state]:
+                        values.append(self.computeQValueFromValues(state, action))
+                    max_value = max(values)
+                    self.values[state] = max_value
 
     def getValue(self, state):
         """
@@ -98,9 +75,14 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        prob = self.mdp.getTransitionStatesAndProbs(state, action)[0][1]
-        value = self.values[state]
-        return sum()
+        
+        if(not self.mdp.isTerminal(state)):
+            transitionValue = 0.0
+            statesAndProbs = self.mdp.getTransitionStatesAndProbs(state, action)
+            for nextState, prob in statesAndProbs:
+                transitionValue += self.values[nextState]*prob                
+            return self.mdp.getReward(state, action, nextState) * self.discount * transitionValue
+            
 
     def computeActionFromValues(self, state):
         """
@@ -112,7 +94,7 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        if(self.mdp.isTerminal()):
+        if(self.mdp.isTerminal(state)):
             return None
         return max(self.mdp.getPossibleActions(state))
 
